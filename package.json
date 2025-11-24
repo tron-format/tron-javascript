@@ -6,6 +6,14 @@
   "license": "MIT",
   "type": "module",
   "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tron-format/tron-javascript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tron-format/tron-javascript/issues"
+  },
+  "homepage": "https://github.com/tron-format/tron-javascript#readme",
   "files": [
     "dist"
   ],

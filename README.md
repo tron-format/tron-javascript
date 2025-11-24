@@ -5,7 +5,7 @@ The official JavaScript library for converting data to and from the TRON (Token 
 ## Installation
 
 ```bash
-npm add git+https://github.com/tron-format/tron-javascript.git
+npm i @tron-format/tron
 ```
 
 ## Usage

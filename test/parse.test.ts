@@ -97,5 +97,56 @@ Order(
     };
     expect(TRON.parse(tron)).toEqual(expected);
   });
+
+  describe('Naming Validation', () => {
+    it('should parse class names with letters, numbers, and underscores', () => {
+      const input = `
+class My_Class_1: value
+My_Class_1(10)
+`;
+      expect(TRON.parse(input)).toEqual({ value: 10 });
+    });
+
+    it('should fail if class name starts with a number', () => {
+      const input = `
+class 1Class: value
+1Class(10)
+`;
+      expect(() => TRON.parse(input)).toThrow(SyntaxError);
+    });
+
+    it('should fail if class name contains invalid characters', () => {
+      const input = `
+class My-Class: value
+My-Class(10)
+`;
+      expect(() => TRON.parse(input)).toThrow(SyntaxError);
+    });
+
+    it('should parse class definitions with quoted property names', () => {
+      const input = `
+class Test: "key-1", key_2
+Test(1, 2)
+`;
+      const result = TRON.parse(input);
+      expect(result).toEqual({ "key-1": 1, key_2: 2 });
+    });
+
+    it('should fail if unquoted property name starts with a number', () => {
+      const input = `
+class MyClass: 1value
+MyClass(10)
+`;
+      expect(() => TRON.parse(input)).toThrow(SyntaxError);
+    });
+
+    it('should fail if unquoted property name contains invalid characters', () => {
+      const input = `
+class MyClass: my-value
+MyClass(10)
+`;
+      expect(() => TRON.parse(input)).toThrow(SyntaxError);
+    });
+  });
 });
 

@@ -66,7 +66,14 @@ export function stringify(value: any): string {
   for (const cls of classes) {
     // "class ClassName: prop1,prop2"
     // Compact output: no spaces
-    output += `class ${cls.name}: ${cls.keys.join(',')}\n`;
+    const keys = cls.keys.map(key => {
+      if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(key)) {
+        return key;
+      } else {
+        return JSON.stringify(key);
+      }
+    });
+    output += `class ${cls.name}: ${keys.join(',')}\n`;
   }
 
   if (output.length > 0) {

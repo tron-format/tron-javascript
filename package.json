@@ -1,6 +1,6 @@
 {
   "name": "@tron-format/tron",
-  "version": "0.0.0",
+  "version": "0.1.0-alpha.0",
   "description": "Token Reduced Object Notation (TRON) is a data serialization format, extended from JSON, with token efficiency features.",
   "author": "Tim Huang <timhuang95@gmail.com>",
   "license": "MIT",
@@ -11,11 +11,16 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lint": "eslint src test"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
+    "@eslint/js": "^9.39.1",
     "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.47.0",
+    "@typescript-eslint/parser": "^8.47.0",
+    "eslint": "^9.39.1",
+    "typescript": "^5.0.0",
     "vitest": "^1.0.0"
   },
   "keywords": []

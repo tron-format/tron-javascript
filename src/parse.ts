@@ -1,5 +1,5 @@
 import { tokenize, Token, TokenType } from './tokenizer.js';
-import { ClassDefinition, TronValue } from './types.js';
+import { ClassDefinition } from './types.js';
 
 export function parse(text: string): any {
   const tokens = tokenize(text);
@@ -38,16 +38,18 @@ class Parser {
 
     // 2. Parse Data
     if (this.isAtEnd()) {
-      throw new Error("Unexpected end of input: No data section found");
+      throw new SyntaxError("Unexpected end of input: No data section found");
     }
 
     const data = this.parseValue();
 
     // Ensure no extra data (except whitespace/comments which are already handled/ignored)
-    while (this.match(TokenType.NEWLINE) || this.match(TokenType.SEMICOLON)) { }
+    while (this.match(TokenType.NEWLINE) || this.match(TokenType.SEMICOLON)) {
+      // consume
+    }
 
     if (!this.isAtEnd()) {
-      throw new Error(`Unexpected token after data: ${this.peek().value} at ${this.peek().line}:${this.peek().column}`);
+      throw new SyntaxError(`Unexpected token after data: ${this.peek().value} at ${this.peek().line}:${this.peek().column}`);
     }
 
     return data;
@@ -129,20 +131,24 @@ class Parser {
       return this.parseClassInstantiation();
     }
 
-    throw new Error(`Unexpected token in value: ${this.peek().value} at ${this.peek().line}:${this.peek().column}`);
+    throw new SyntaxError(`Unexpected token in value: ${this.peek().value} at ${this.peek().line}:${this.peek().column}`);
   }
 
   private parseArray(): any[] {
     const arr: any[] = [];
     if (!this.check(TokenType.RBRACKET)) {
       while (true) {
-        while (this.match(TokenType.NEWLINE)) { }
+        while (this.match(TokenType.NEWLINE)) {
+          // consume
+        }
 
         if (this.check(TokenType.RBRACKET)) break;
 
         arr.push(this.parseValue());
 
-        while (this.match(TokenType.NEWLINE)) { }
+        while (this.match(TokenType.NEWLINE)) {
+          // consume
+        }
 
         if (!this.match(TokenType.COMMA)) break;
       }
@@ -155,7 +161,9 @@ class Parser {
     const obj: any = {};
     if (!this.check(TokenType.RBRACE)) {
       while (true) {
-        while (this.match(TokenType.NEWLINE)) { }
+        while (this.match(TokenType.NEWLINE)) {
+          // consume
+        }
 
         if (this.check(TokenType.RBRACE)) break;
 
@@ -167,7 +175,9 @@ class Parser {
         const value = this.parseValue();
         obj[key] = value;
 
-        while (this.match(TokenType.NEWLINE)) { }
+        while (this.match(TokenType.NEWLINE)) {
+          // consume
+        }
 
         if (!this.match(TokenType.COMMA)) break;
       }
@@ -182,7 +192,7 @@ class Parser {
 
     const classDef = this.classes.get(className);
     if (!classDef) {
-      throw new Error(`Undefined class: ${className} at ${classNameToken.line}:${classNameToken.column}`);
+      throw new SyntaxError(`Undefined class: ${className} at ${classNameToken.line}:${classNameToken.column}`);
     }
 
     this.consume(TokenType.LPAREN, "Expect '(' after class name.");
@@ -192,12 +202,14 @@ class Parser {
 
     if (!this.check(TokenType.RPAREN)) {
       while (true) {
-        while (this.match(TokenType.NEWLINE)) { }
+        while (this.match(TokenType.NEWLINE)) {
+          // consume
+        }
 
         if (this.check(TokenType.RPAREN)) break;
 
         if (argIndex >= classDef.properties.length) {
-          throw new Error(`Too many arguments for class ${className} at ${this.peek().line}:${this.peek().column}`);
+          throw new SyntaxError(`Too many arguments for class ${className} at ${this.peek().line}:${this.peek().column}`);
         }
 
         const value = this.parseValue();
@@ -205,14 +217,16 @@ class Parser {
         obj[propName] = value;
         argIndex++;
 
-        while (this.match(TokenType.NEWLINE)) { }
+        while (this.match(TokenType.NEWLINE)) {
+          // consume
+        }
 
         if (!this.match(TokenType.COMMA)) break;
       }
     }
 
     if (argIndex < classDef.properties.length) {
-      throw new Error(`Too few arguments for class ${className}, expected ${classDef.properties.length}, got ${argIndex}`);
+      throw new SyntaxError(`Too few arguments for class ${className}, expected ${classDef.properties.length}, got ${argIndex}`);
     }
 
     this.consume(TokenType.RPAREN, "Expect ')' after arguments.");
@@ -257,6 +271,6 @@ class Parser {
 
   private consume(type: TokenType, message: string): Token {
     if (this.check(type)) return this.advance();
-    throw new Error(`${message} Found ${this.peek().value} at ${this.peek().line}:${this.peek().column}`);
+    throw new SyntaxError(`${message} Found ${this.peek().value} at ${this.peek().line}:${this.peek().column}`);
   }
 }

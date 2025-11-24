@@ -88,7 +88,7 @@ export function tokenize(input: string): Token[] {
         if (c === '\\') {
           cursor++;
           column++;
-          if (cursor >= input.length) throw new Error(`Unexpected end of input in string at ${line}:${column}`);
+          if (cursor >= input.length) throw new SyntaxError(`Unexpected end of input in string at ${line}:${column}`);
           const escaped = input[cursor];
           // Simple escape handling for now, similar to JSON
           if (escaped === '"') value += '"';
@@ -166,7 +166,7 @@ export function tokenize(input: string): Token[] {
       continue;
     }
 
-    throw new Error(`Unexpected character '${char}' at ${line}:${column}`);
+    throw new SyntaxError(`Unexpected character '${char}' at ${line}:${column}`);
   }
 
   tokens.push({ type: TokenType.EOF, value: '', line, column });

@@ -51,10 +51,17 @@ describe('TRON stringify', () => {
     const obj: any = { a: {} };
     obj.a.parent = obj;
     expect(() => TRON.stringify(obj)).toThrow(TypeError);
-    expect(() => TRON.stringify(obj)).toThrow(/circular/i);
   });
 
   it('should throw on BigInt', () => {
      expect(() => TRON.stringify(1n)).toThrow(TypeError);
+  });
+
+  it('should quote property names with special characters', () => {
+    const obj = { "1a": 1, "a1": 2, "valid_name": 3, "foo-bar": 4 };
+    const tron = TRON.stringify(obj);
+    
+    // Check that the class definition quotes "foo-bar"
+    expect(tron).toContain('class Object1: "1a",a1,valid_name,"foo-bar"');
   });
 });

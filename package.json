@@ -13,7 +13,7 @@
   "bugs": {
     "url": "https://github.com/tron-format/tron-javascript/issues"
   },
-  "homepage": "https://github.com/tron-format/tron-javascript#readme",
+  "homepage": "https://tron-format.github.io/",
   "files": [
     "dist"
   ],

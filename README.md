@@ -2,6 +2,8 @@
 
 The official JavaScript library for converting data to and from the TRON (Token Reduced Object Notation) format.
 
+See full specification for the TRON format here: https://tron-format.github.io/
+
 ## Installation
 
 ```bash
@@ -34,5 +36,5 @@ console.log(parsed);
 In JavaScript, calling `JSON.stringify(undefined)` returns `undefined`. However, calling `TRON.stringify(undefined)` returns `'null'` instead. This is intentional to better align with the function's return type (string only) for TypeScript.
 
 Other cases of stringifying undefined are handled the same way as JSON.stringify. For example:
-- Both `JSON.stringify([undefined])` and `TRON.stringify([undefined])` return `'[null]'`
-- Both `JSON.stringify({ a: undefined })` and `TRON.stringify({ a: undefined })` return `'{}'`
+- `TRON.stringify([undefined])` returns `'[null]'` (same behavior as `JSON.stringify([undefined])`)
+- `TRON.stringify({ a: undefined })` returns `'{}'` (same behavior as `JSON.stringify({ a: undefined })`)

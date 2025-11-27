@@ -60,6 +60,21 @@ class Parser {
     const nameToken = this.consume(TokenType.IDENTIFIER, "Expect class name.");
     const className = nameToken.value;
 
+    // Check for class inheritance: class ChildClass(ParentClass): ...
+    let parentProperties: string[] = [];
+    if (this.match(TokenType.LPAREN)) {
+      const parentNameToken = this.consume(TokenType.IDENTIFIER, "Expect parent class name.");
+      const parentClassName = parentNameToken.value;
+      
+      const parentClassDef = this.classes.get(parentClassName);
+      if (!parentClassDef) {
+        throw new SyntaxError(`Undefined parent class: ${parentClassName} at ${parentNameToken.line}:${parentNameToken.column}`);
+      }
+      
+      parentProperties = [...parentClassDef.properties];
+      this.consume(TokenType.RPAREN, "Expect ')' after parent class name.");
+    }
+
     // Expect Colon
     this.consume(TokenType.COLON, "Expect ':' after class name.");
 
@@ -70,9 +85,8 @@ class Parser {
       // Check for start of data (heuristic)
       // If we see an Identifier followed by '(', it's likely a class instantiation (Data)
 
-      // Officially, the spec says that properties separated by newlines should share the same indentation.
-      // However, since the current tokenizer doesn't track indentation depth easily (yet), 
-      // we secretly allow properties separated by newlines to have different indentation.
+      // Officially, the spec says that properties separated by newlines should share the same indentation as best practice.
+      // However, this is not a requirement, and thus properties separated by newlines can have different indentation.
 
       if (this.match(TokenType.NEWLINE)) {
         // If next token is CLASS, we are done.
@@ -102,7 +116,9 @@ class Parser {
       }
     }
 
-    this.classes.set(className, { name: className, properties });
+    // Combine parent properties (if any) with own properties
+    const allProperties = [...parentProperties, ...properties];
+    this.classes.set(className, { name: className, properties: allProperties });
   }
 
   private parseValue(): any {
@@ -198,7 +214,9 @@ class Parser {
     this.consume(TokenType.LPAREN, "Expect '(' after class name.");
 
     const obj: any = {};
-    let argIndex = 0;
+    const assignedProps = new Set<string>();
+    let positionalIndex = 0;
+    let seenNamedArg = false;
 
     if (!this.check(TokenType.RPAREN)) {
       while (true) {
@@ -208,14 +226,43 @@ class Parser {
 
         if (this.check(TokenType.RPAREN)) break;
 
-        if (argIndex >= classDef.properties.length) {
-          throw new SyntaxError(`Too many arguments for class ${className} at ${this.peek().line}:${this.peek().column}`);
-        }
+        // Check if this is a named argument: identifier or string followed by '='
+        const isNamedArg = (this.check(TokenType.IDENTIFIER) || this.check(TokenType.STRING)) && this.checkNext(TokenType.EQUALS);
+        if (isNamedArg) {
+          seenNamedArg = true;
+          const propNameToken = this.advance();
+          const propName = propNameToken.value;
+          
+          // Verify property exists in class
+          if (!classDef.properties.includes(propName)) {
+            throw new SyntaxError(`Unknown property '${propName}' for class ${className} at ${propNameToken.line}:${propNameToken.column}`);
+          }
+          
+          // Verify property hasn't been assigned yet
+          if (assignedProps.has(propName)) {
+            throw new SyntaxError(`Property '${propName}' already assigned for class ${className} at ${propNameToken.line}:${propNameToken.column}`);
+          }
+          
+          this.consume(TokenType.EQUALS, "Expect '=' after property name.");
+          const value = this.parseValue();
+          obj[propName] = value;
+          assignedProps.add(propName);
+        } else {
+          // Positional argument
+          if (seenNamedArg) {
+            throw new SyntaxError(`Positional argument cannot appear after named argument at ${this.peek().line}:${this.peek().column}`);
+          }
+          
+          if (positionalIndex >= classDef.properties.length) {
+            throw new SyntaxError(`Too many arguments for class ${className} at ${this.peek().line}:${this.peek().column}`);
+          }
 
-        const value = this.parseValue();
-        const propName = classDef.properties[argIndex];
-        obj[propName] = value;
-        argIndex++;
+          const value = this.parseValue();
+          const propName = classDef.properties[positionalIndex];
+          obj[propName] = value;
+          assignedProps.add(propName);
+          positionalIndex++;
+        }
 
         while (this.match(TokenType.NEWLINE)) {
           // consume
@@ -225,8 +272,10 @@ class Parser {
       }
     }
 
-    if (argIndex < classDef.properties.length) {
-      throw new SyntaxError(`Too few arguments for class ${className}, expected ${classDef.properties.length}, got ${argIndex}`);
+    // Verify all properties are assigned
+    if (assignedProps.size < classDef.properties.length) {
+      const missingProps = classDef.properties.filter(p => !assignedProps.has(p));
+      throw new SyntaxError(`Missing arguments for class ${className}: ${missingProps.join(', ')}`);
     }
 
     this.consume(TokenType.RPAREN, "Expect ')' after arguments.");

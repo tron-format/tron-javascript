@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is the official JavaScript/TypeScript library for **TRON (Token Reduced Object Notation)**, a data serialization format extended from JSON with token efficiency features. TRON reduces token count for LLMs by defining reusable class schemas for objects with repeated structures.
+This is a JavaScript/TypeScript library for **TRON (Token Reduced Object Notation)**, a data serialization format extended from JSON with token efficiency features. TRON reduces token count for LLMs by defining reusable class schemas for objects with repeated structures.
 
 For complete TRON specification, see: https://tron-format.github.io/
 
@@ -68,7 +68,7 @@ When modifying `parse.ts`:
 - Parser expects two main sections: class definitions header, then data
 - Uses a tokenizer (`tokenizer.ts`) to convert text to tokens first
 - Maintains a map of class names to their property definitions
-- Handles both class instances (e.g., `Object1(...)`) and plain values
+- Handles both class instances (e.g., `A(...)`) and plain values
 
 When modifying `tokenizer.ts`:
 - Tokenizes TRON text into tokens (identifiers, strings, numbers, brackets, comments, etc.)
@@ -100,7 +100,7 @@ This behavior is documented in README.md and is intentional for TypeScript type 
 - Objects with identical property sets share the same class definition
 - Keys are sorted for signature comparison (so `{b:2, a:1}` and `{a:1, b:2}` use same class)
 - Original key order from first occurrence is preserved in class definition
-- Class names are auto-generated as `Object1`, `Object2`, etc.
+- Class names are auto-generated as `A`, `B`, etc.
 
 ## Contributing Guidelines
 

@@ -68,13 +68,16 @@ Outer(Inner([1,2,], {"key": "value",},),)
     expect(TRON.parse(tron)).toEqual({ inner: { val1: [1,2], val2: {"key": "value"} } });
   });
 
-  it('should parse example from spec', () => {
+  it('should parse extending classes', () => {
     const tron = `
-class Order:
-  index,items,total
+class Base:
+  index
 
-class Product:
-  index,name,price,quantity
+class Order(Base):
+  items,total
+
+class Product(Base):
+  name,price,quantity
 
 Order(
   "ord-123",
@@ -98,7 +101,7 @@ Order(
     expect(TRON.parse(tron)).toEqual(expected);
   });
 
-  describe('Naming Validation', () => {
+  describe('Naming validation', () => {
     it('should parse class names with letters, numbers, and underscores', () => {
       const input = `
 class My_Class_1: value
@@ -148,5 +151,57 @@ MyClass(10)
       expect(() => TRON.parse(input)).toThrow(SyntaxError);
     });
   });
-});
 
+  describe('Assigning argument by name', () => {
+    it('should parse class with named arguments', () => {
+      const input = `
+class MyClass: a,b
+[
+  MyClass(a=1, b=2), 
+  MyClass(b=4, "a"=3) # quoted property name is allowed
+]
+`;
+      expect(TRON.parse(input)).toEqual([{ a: 1, b: 2 }, { a: 3, b: 4 }]);
+    });
+
+    it('should parse class with named arguments after positional arguments', () => {
+      const input = `
+class MyClass: a,b
+MyClass(1, b=2)
+`;
+      expect(TRON.parse(input)).toEqual({ a: 1, b: 2 });
+    });
+
+    it('should fail if positional argument is after named argument', () => {
+      const input = `
+class MyClass: a,b
+MyClass(a=1, 2)
+`;
+      expect(() => TRON.parse(input)).toThrow(SyntaxError);
+    });
+
+    it('should fail if not all arguments are assigned', () => {
+      const input = `
+class MyClass: a,b
+[MyClass(a=1), MyClass(b=2)]
+`;
+      expect(() => TRON.parse(input)).toThrow(SyntaxError);
+    });
+
+    it('should fail if argument name is not a valid identifier', () => {
+      const input = `
+class MyClass: a,b
+MyClass(a=1, b=2, c=3)
+`;
+      expect(() => TRON.parse(input)).toThrow(SyntaxError);
+    });
+
+    it('should fail if argument name occurs multiple times', () => {
+      const input = `
+class MyClass: a,b
+MyClass(a=1, b=2, a=3)
+`;
+      expect(() => TRON.parse(input)).toThrow(SyntaxError);
+    });
+  });
+});

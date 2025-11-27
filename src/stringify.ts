@@ -3,6 +3,23 @@ interface ClassDef {
   keys: string[];
 }
 
+function generateClassName(index: number): string {
+  // Index is 0-based
+  // 0-25: A-Z
+  // 26-51: A1-Z1
+  // 52-77: A2-Z2
+  // etc.
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const cycle = Math.floor(index / 26);
+  const position = index % 26;
+  
+  if (cycle === 0) {
+    return letters[position];
+  } else {
+    return letters[position] + cycle;
+  }
+}
+
 export function stringify(value: any): string {
   if (value === undefined) {
     return "null";
@@ -11,7 +28,7 @@ export function stringify(value: any): string {
   // 1. BFS to discover classes
   const classes: ClassDef[] = [];
   const schemaToClass = new Map<string, ClassDef>();
-  let classCounter = 1;
+  let classCounter = 0;
 
   const visited = new Set<any>();
   const queue: any[] = [value];
@@ -44,7 +61,7 @@ export function stringify(value: any): string {
           const schemaSignature = sortedKeys.join(',');
 
           if (!schemaToClass.has(schemaSignature)) {
-            const className = `Object${classCounter++}`;
+            const className = generateClassName(classCounter++);
             // Use the original keys order from the first occurrence for the class definition
             // to preserve meaningful ordering (e.g. as seen in JSON)
             const classDef = { name: className, keys: [...keys] };
@@ -144,3 +161,7 @@ function serialize(value: any, schemaToClass: Map<string, ClassDef>, stack: Set<
 
   throw new TypeError(`Unsupported type: ${typeof value}`);
 }
+
+export const exportedForUnitTesting = {
+  generateClassName,
+};

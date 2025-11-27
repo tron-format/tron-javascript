@@ -1,6 +1,6 @@
 # tron-format
 
-The official JavaScript library for converting data to and from the TRON (Token Reduced Object Notation) format.
+A JavaScript library for converting data to and from the TRON (Token Reduced Object Notation) format.
 
 See full specification for the TRON format here: https://tron-format.github.io/
 
@@ -19,9 +19,9 @@ const value = { a: 1, b: 2 };
 const tron = TRON.stringify(value);
 console.log(tron);
 // Output: 
-// class Object1: a,b
+// class A: a,b
 // 
-// Object1(1,2)
+// A(1,2)
 
 const parsed = TRON.parse(tron);
 console.log(parsed);

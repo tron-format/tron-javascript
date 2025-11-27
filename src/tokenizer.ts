@@ -15,6 +15,7 @@ export enum TokenType {
   COMMA,
   COLON,
   SEMICOLON,
+  EQUALS,
   NEWLINE,
   EOF
 }
@@ -70,6 +71,7 @@ export function tokenize(input: string): Token[] {
     if (char === ',') { tokens.push({ type: TokenType.COMMA, value: ',', line, column }); cursor++; column++; continue; }
     if (char === ':') { tokens.push({ type: TokenType.COLON, value: ':', line, column }); cursor++; column++; continue; }
     if (char === ';') { tokens.push({ type: TokenType.SEMICOLON, value: ';', line, column }); cursor++; column++; continue; }
+    if (char === '=') { tokens.push({ type: TokenType.EQUALS, value: '=', line, column }); cursor++; column++; continue; }
 
     // Handle Strings
     if (char === '"') {

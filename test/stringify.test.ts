@@ -23,19 +23,19 @@ describe('TRON stringify', () => {
     const obj = { x: 1, y: 2 };
     const tron = TRON.stringify(obj);
     // Expect class definition and instantiation
-    expect(tron).toBe('class Object1: x,y\n\nObject1(1,2)');
+    expect(tron).toBe('class A: x,y\n\nA(1,2)');
   });
 
   it('should reuse classes for same structure', () => {
     const obj = [{ x: 1, y: 2 }, { x: 3, y: 4 }];
     const tron = TRON.stringify(obj);
-    expect(tron).toBe('class Object1: x,y\n\n[Object1(1,2),Object1(3,4)]');
+    expect(tron).toBe('class A: x,y\n\n[A(1,2),A(3,4)]');
   });
 
   it('should handle nested objects', () => {
     const obj = { a: { x: 1, y: 2 }, b: { y: 4, x: 3 } };
     const tron = TRON.stringify(obj);
-    expect(tron).toBe('class Object1: a,b\nclass Object2: x,y\n\nObject1(Object2(1,2),Object2(3,4))');
+    expect(tron).toBe('class A: a,b\nclass B: x,y\n\nA(B(1,2),B(3,4))');
   });
 
   it('should handle undefined the same as JSON.stringify', () => {
@@ -44,7 +44,7 @@ describe('TRON stringify', () => {
     expect(TRON.stringify({ a: undefined })).toBe('{}');
 
     const tron = TRON.stringify({ a: undefined, b: 1 });
-    expect(tron).toBe('class Object1: b\n\nObject1(1)');
+    expect(tron).toBe('class A: b\n\nA(1)');
   });
 
   it('should throw TypeError on circular reference', () => {
@@ -62,6 +62,6 @@ describe('TRON stringify', () => {
     const tron = TRON.stringify(obj);
     
     // Check that the class definition quotes "foo-bar"
-    expect(tron).toContain('class Object1: "1a",a1,valid_name,"foo-bar"');
+    expect(tron).toContain('class A: "1a",a1,valid_name,"foo-bar"');
   });
 });

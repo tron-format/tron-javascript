@@ -85,8 +85,8 @@ class Parser {
       // Check for start of data (heuristic)
       // If we see an Identifier followed by '(', it's likely a class instantiation (Data)
 
-      // Officially, the spec says that properties separated by newlines should share the same indentation as best practice.
-      // However, this is not a requirement, and thus properties separated by newlines can have different indentation.
+      // The TRON specification recommends that properties separated by newlines should share the same indentation.
+      // However, this is not a requirement, and thus properties separated by newlines are allowed to have different indentation.
 
       if (this.match(TokenType.NEWLINE)) {
         // If next token is CLASS, we are done.

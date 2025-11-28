@@ -28,6 +28,7 @@ export function stringify(value: any): string {
   // 1. BFS to discover classes
   const classes: ClassDef[] = [];
   const schemaToClass = new Map<string, ClassDef>();
+  const schemaCounts = new Map<string, number>();
   let classCounter = 0;
 
   const visited = new Set<any>();
@@ -60,6 +61,9 @@ export function stringify(value: any): string {
           const sortedKeys = [...keys].sort();
           const schemaSignature = sortedKeys.join(',');
 
+          // Track occurrence count
+          schemaCounts.set(schemaSignature, (schemaCounts.get(schemaSignature) || 0) + 1);
+
           if (!schemaToClass.has(schemaSignature)) {
             const className = generateClassName(classCounter++);
             // Use the original keys order from the first occurrence for the class definition
@@ -78,9 +82,39 @@ export function stringify(value: any): string {
     }
   }
 
+  // Filter classes based on property count and occurrence:
+  // - 1 property: never define class (always use JSON)
+  // - 2 properties: only define class if occurs more than once
+  // - 3+ properties: always define class
+  const filteredSchemaToClass = new Map<string, ClassDef>();
+  const filteredClasses: ClassDef[] = [];
+  let filteredClassCounter = 0;
+
+  for (const [schemaSignature, classDef] of schemaToClass.entries()) {
+    const propertyCount = classDef.keys.length;
+    const occurrenceCount = schemaCounts.get(schemaSignature) || 0;
+
+    let shouldDefineClass = false;
+    if (propertyCount === 1) {
+      shouldDefineClass = false; // Never define class for 1 property
+    } else if (propertyCount === 2) {
+      shouldDefineClass = occurrenceCount > 1; // Only if occurs more than once
+    } else {
+      shouldDefineClass = true; // Always define class for 3+ properties
+    }
+
+    if (shouldDefineClass) {
+      // Reassign class names sequentially for filtered classes
+      const newClassName = generateClassName(filteredClassCounter++);
+      const newClassDef = { name: newClassName, keys: classDef.keys };
+      filteredSchemaToClass.set(schemaSignature, newClassDef);
+      filteredClasses.push(newClassDef);
+    }
+  }
+
   // 2. Generate Header
   let output = '';
-  for (const cls of classes) {
+  for (const cls of filteredClasses) {
     // "class ClassName: prop1,prop2"
     // Compact output: no spaces
     const keys = cls.keys.map(key => {
@@ -98,7 +132,7 @@ export function stringify(value: any): string {
   }
 
   // 3. Generate Data
-  output += serialize(value, schemaToClass, new Set());
+  output += serialize(value, filteredSchemaToClass, new Set());
 
   return output;
 }
@@ -151,8 +185,13 @@ function serialize(value: any, schemaToClass: Map<string, ClassDef>, stack: Set<
         const args = classDef.keys.map(key => serialize(value[key], schemaToClass, stack)).join(',');
         return `${classDef.name}(${args})`;
       } else {
-        // Should not happen if BFS worked correctly
-        throw new Error(`Unknown schema for object: ${JSON.stringify(value)}`);
+        // Use JSON object syntax when no class definition exists
+        // Always quote keys to match JSON format
+        const pairs = keys.map(key => {
+          const keyStr = JSON.stringify(key);
+          return `${keyStr}:${serialize(value[key], schemaToClass, stack)}`;
+        }).join(',');
+        return `{${pairs}}`;
       }
     } finally {
       stack.delete(value);

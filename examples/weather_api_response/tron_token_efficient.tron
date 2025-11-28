@@ -1,8 +1,6 @@
-class A: bulk
-class B: query
-class C: custom_id,q,location,current
-class D: name,region,country,lat,lon,tz_id,localtime_epoch,localtime
-class E: last_updated_epoch,last_updated,temp_c,temp_f,is_day,condition,wind_mph,wind_kph,wind_degree,wind_dir,pressure_mb,pressure_in,precip_mm,precip_in,humidity,cloud,feelslike_c,feelslike_f,vis_km,vis_miles,uv,gust_mph,gust_kph
-class F: text,icon,code
+class A: custom_id,q,location,current
+class B: name,region,country,lat,lon,tz_id,localtime_epoch,localtime
+class C: last_updated_epoch,last_updated,temp_c,temp_f,is_day,condition,wind_mph,wind_kph,wind_degree,wind_dir,pressure_mb,pressure_in,precip_mm,precip_in,humidity,cloud,feelslike_c,feelslike_f,vis_km,vis_miles,uv,gust_mph,gust_kph
+class D: text,icon,code
 
-A([B(C("my-id-1","53,-0.12",D("Boston","Lincolnshire","United Kingdom",53,-0.12,"Europe/London",1673620218,"2023-01-13 14:30"),E(1673620200,"2023-01-13 14:30",8.7,47.7,1,F("Partly cloudy","//cdn.weatherapi.com/weather/64x64/day/116.png",1003),24.2,38.9,260,"W",1005,29.68,0,0,74,75,4.4,39.9,10,6,2,33.1,53.3))),B(C("any-internal-id","London",D("London","City of London, Greater London","United Kingdom",51.52,-0.11,"Europe/London",1673620218,"2023-01-13 14:30"),E(1673620200,"2023-01-13 14:30",11,51.8,1,F("Partly cloudy","//cdn.weatherapi.com/weather/64x64/day/116.png",1003),23,37.1,270,"W",1010,29.83,0,0,58,75,8.1,46.5,10,6,2,22.4,36))),B(C("us-zipcode-id-765","90201",D("Bell","California","USA",33.97,-118.17,"America/Los_Angeles",1673620220,"2023-01-13 6:30"),E(1673620200,"2023-01-13 06:30",10,50,0,F("Clear","//cdn.weatherapi.com/weather/64x64/night/113.png",1000),2.2,3.6,10,"N",1020,30.13,0,0,74,0,10.3,50.5,16,9,1,3.6,5.8)))])
+{"bulk":[{"query":A("my-id-1","53,-0.12",B("Boston","Lincolnshire","United Kingdom",53,-0.12,"Europe/London",1673620218,"2023-01-13 14:30"),C(1673620200,"2023-01-13 14:30",8.7,47.7,1,D("Partly cloudy","//cdn.weatherapi.com/weather/64x64/day/116.png",1003),24.2,38.9,260,"W",1005,29.68,0,0,74,75,4.4,39.9,10,6,2,33.1,53.3))},{"query":A("any-internal-id","London",B("London","City of London, Greater London","United Kingdom",51.52,-0.11,"Europe/London",1673620218,"2023-01-13 14:30"),C(1673620200,"2023-01-13 14:30",11,51.8,1,D("Partly cloudy","//cdn.weatherapi.com/weather/64x64/day/116.png",1003),23,37.1,270,"W",1010,29.83,0,0,58,75,8.1,46.5,10,6,2,22.4,36))},{"query":A("us-zipcode-id-765","90201",B("Bell","California","USA",33.97,-118.17,"America/Los_Angeles",1673620220,"2023-01-13 6:30"),C(1673620200,"2023-01-13 06:30",10,50,0,D("Clear","//cdn.weatherapi.com/weather/64x64/night/113.png",1000),2.2,3.6,10,"N",1020,30.13,0,0,74,0,10.3,50.5,16,9,1,3.6,5.8))}]}

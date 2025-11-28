@@ -107,9 +107,9 @@ describe('TRON stringify', () => {
       // Outer object has 4 properties, so it gets a class definition
       // single: JSON (1 property) - should be {"a":1}
       // twoOnce: JSON (2 properties, occurs once) - should be {"b":2,"c":3}
-      // twoTwice: class (2 properties, occurs twice) - should use class C
-      // three: class (3+ properties) - should use class B
-      expect(tron).toBe('class A: single,twoOnce,twoTwice,three\nclass B: f,g,h\nclass C: d,e\n\nA({"a":1},{"b":2,"c":3},[C(4,5),C(6,7)],B(8,9,10))');
+      // twoTwice: class (2 properties, occurs twice) - should use class B (DFS visits before three)
+      // three: class (3+ properties) - should use class C
+      expect(tron).toBe('class A: single,twoOnce,twoTwice,three\nclass B: d,e\nclass C: f,g,h\n\nA({"a":1},{"b":2,"c":3},[B(4,5),B(6,7)],C(8,9,10))');
     });
 
     it('should handle nested objects with conditional class definition', () => {

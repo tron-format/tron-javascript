@@ -25,62 +25,62 @@ export function stringify(value: any): string {
     return "null";
   }
 
-  // 1. BFS to discover classes
+  // 1. DFS to discover classes (outer objects are defined before inner objects)
   const classes: ClassDef[] = [];
   const schemaToClass = new Map<string, ClassDef>();
   const schemaCounts = new Map<string, number>();
   let classCounter = 0;
 
   const visited = new Set<any>();
-  const queue: any[] = [value];
 
   // We need to traverse the entire structure to find all schemas.
   // Note: We track visited objects to prevent infinite loops in case of cycles during schema discovery.
   // Actual cycle detection (throwing error) happens during serialization.
 
-  let head = 0;
-  while (head < queue.length) {
-    const current = queue[head++];
+  function dfsDiscover(current: any): void {
+    if (!current || typeof current !== 'object') {
+      return;
+    }
 
-    if (current && typeof current === 'object') {
-      if (visited.has(current)) {
-        continue;
+    if (visited.has(current)) {
+      return;
+    }
+    visited.add(current);
+
+    if (Array.isArray(current)) {
+      for (const item of current) {
+        dfsDiscover(item);
       }
-      visited.add(current);
+    } else {
+      // Plain object
+      const keys = Object.keys(current).filter(k => current[k] !== undefined);
+      if (keys.length > 0) {
+        // Use sorted keys for signature to ensure consistent schema for same structure
+        // regardless of key order (e.g. {a:1, b:2} == {b:2, a:1})
+        const sortedKeys = [...keys].sort();
+        const schemaSignature = sortedKeys.join(',');
 
-      if (Array.isArray(current)) {
-        for (const item of current) {
-          queue.push(item);
+        // Track occurrence count
+        schemaCounts.set(schemaSignature, (schemaCounts.get(schemaSignature) || 0) + 1);
+
+        if (!schemaToClass.has(schemaSignature)) {
+          const className = generateClassName(classCounter++);
+          // Use the original keys order from the first occurrence for the class definition
+          // to preserve meaningful ordering (e.g. as seen in JSON)
+          const classDef = { name: className, keys: [...keys] };
+          classes.push(classDef);
+          schemaToClass.set(schemaSignature, classDef);
         }
-      } else {
-        // Plain object
-        const keys = Object.keys(current).filter(k => current[k] !== undefined);
-        if (keys.length > 0) {
-          // Use sorted keys for signature to ensure consistent schema for same structure
-          // regardless of key order (e.g. {a:1, b:2} == {b:2, a:1})
-          const sortedKeys = [...keys].sort();
-          const schemaSignature = sortedKeys.join(',');
 
-          // Track occurrence count
-          schemaCounts.set(schemaSignature, (schemaCounts.get(schemaSignature) || 0) + 1);
-
-          if (!schemaToClass.has(schemaSignature)) {
-            const className = generateClassName(classCounter++);
-            // Use the original keys order from the first occurrence for the class definition
-            // to preserve meaningful ordering (e.g. as seen in JSON)
-            const classDef = { name: className, keys: [...keys] };
-            classes.push(classDef);
-            schemaToClass.set(schemaSignature, classDef);
-          }
-
-          // Add values to queue
-          for (const key of keys) {
-            queue.push(current[key]);
-          }
+        // Recursively visit children (DFS: process children immediately)
+        for (const key of keys) {
+          dfsDiscover(current[key]);
         }
       }
     }
   }
+
+  dfsDiscover(value);
 
   // Filter classes based on property count and occurrence:
   // - 1 property: never define class (always use JSON)

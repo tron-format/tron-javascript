@@ -1,8 +1,11 @@
-# tron-format
+# @tron-format/tron
+
+[![CI](https://github.com/tron-format/tron-javascript/actions/workflows/ci.yml/badge.svg)](https://github.com/tron-format/tron-javascript)
+[![License: MIT](https://img.shields.io/badge/license-MIT-fef3c0?labelColor=1b1b1f)](./LICENSE)
 
 A JavaScript library for converting data to and from the TRON (Token Reduced Object Notation) format.
 
-See full specification for the TRON format here: https://tron-format.github.io/
+See full specification for the TRON format at: https://tron-format.github.io/
 
 ## Installation
 
@@ -38,3 +41,15 @@ In JavaScript, calling `JSON.stringify(undefined)` returns `undefined`. However,
 Other cases of stringifying undefined are handled the same way as JSON.stringify. For example:
 - `TRON.stringify([undefined])` returns `'[null]'` (same behavior as `JSON.stringify([undefined])`)
 - `TRON.stringify({ a: undefined })` returns `'{}'` (same behavior as `JSON.stringify({ a: undefined })`)
+
+## Playground
+
+Want to try out TRON with your own JSON data?
+
+Go to https://tron-format.github.io/ and click on "Playground" in the top navigation bar.
+
+Paste it in your data and see TRON's token efficiency compared to other data formats!
+
+## License
+
+[MIT](./LICENSE) License © 2025-PRESENT Tim Huang

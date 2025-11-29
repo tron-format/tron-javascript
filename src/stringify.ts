@@ -83,9 +83,8 @@ export function stringify(value: any): string {
   dfsDiscover(value);
 
   // Filter classes based on property count and occurrence:
-  // - 1 property: never define class (always use JSON)
-  // - 2 properties: only define class if occurs more than once
-  // - 3+ properties: always define class
+  // - 1 property or 1 occurence: never define class (always use JSON)
+  // - 2+ properties and 2+ occurrences: always define class
   const filteredSchemaToClass = new Map<string, ClassDef>();
   const filteredClasses: ClassDef[] = [];
   let filteredClassCounter = 0;
@@ -94,15 +93,7 @@ export function stringify(value: any): string {
     const propertyCount = classDef.keys.length;
     const occurrenceCount = schemaCounts.get(schemaSignature) || 0;
 
-    let shouldDefineClass = false;
-    if (propertyCount === 1) {
-      shouldDefineClass = false; // Never define class for 1 property
-    } else if (propertyCount === 2) {
-      shouldDefineClass = occurrenceCount > 1; // Only if occurs more than once
-    } else {
-      shouldDefineClass = true; // Always define class for 3+ properties
-    }
-
+    const shouldDefineClass = propertyCount > 1 && occurrenceCount > 1;
     if (shouldDefineClass) {
       // Reassign class names sequentially for filtered classes
       const newClassName = generateClassName(filteredClassCounter++);

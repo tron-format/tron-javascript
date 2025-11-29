@@ -1,6 +1,6 @@
 {
   "name": "@tron-format/tron",
-  "version": "0.1.3-beta.0",
+  "version": "0.1.4-beta.0",
   "description": "Token Reduced Object Notation (TRON) is a data serialization format, extended from JSON, with token efficiency features.",
   "author": "Tim Huang <timhuang95@gmail.com>",
   "license": "MIT",

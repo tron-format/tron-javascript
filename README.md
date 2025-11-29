@@ -46,9 +46,9 @@ Other cases of stringifying undefined are handled the same way as JSON.stringify
 
 Want to try out TRON with your own JSON data?
 
-Go to https://tron-format.github.io/ and click on "Playground" in the top navigation bar.
+Go to https://tron-format.github.io/#/playground and select "Custom Data".
 
-Paste it in your data and see TRON's token efficiency compared to other data formats!
+Paste in your data to see TRON's token efficiency compared to other data formats!
 
 ## License
 

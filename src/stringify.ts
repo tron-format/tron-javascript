@@ -83,7 +83,7 @@ export function stringify(value: any): string {
   dfsDiscover(value);
 
   // Filter classes based on property count and occurrence:
-  // - 1 property or 1 occurence: never define class (always use JSON)
+  // - 1 property or 1 occurrence: never define class (always use JSON)
   // - 2+ properties and 2+ occurrences: always define class
   const filteredSchemaToClass = new Map<string, ClassDef>();
   const filteredClasses: ClassDef[] = [];

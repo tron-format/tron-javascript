@@ -18,18 +18,18 @@ npm i @tron-format/tron
 ```typescript
 import { TRON } from '@tron-format/tron';
 
-const value = { a: 1, b: 2 };
+const value = [{ a: 1, b: 2 }, { a: 3, b: 4 }];
 const tron = TRON.stringify(value);
 console.log(tron);
 // Output: 
 // class A: a,b
 // 
-// A(1,2)
+// [A(1,2), A(3,4)]
 
 const parsed = TRON.parse(tron);
 console.log(parsed);
 // Output:
-// { a: 1, b: 2 }
+// [{ a: 1, b: 2 }, { a: 3, b: 4 }]
 ```
 
 ## Considerations
